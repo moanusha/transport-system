@@ -5,32 +5,37 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-	<sub-flow name="fastgo-getschedulesSub_Flow" doc:id="def1f838-bab9-4dc1-a422-1cb4d8c33300" >
-		<http:request method="GET" doc:name="Request" doc:id="44eb2ace-1dd6-4e1c-8ebc-4cae964ef03c" config-ref="HTTP_Request_configurationfastgo" path="/p2/schedules">
+	<sub-flow name="getSchedules-exp-web-app-implementationSub_Flow" doc:id="6083e046-03fb-435f-94e8-69a28585eb83" >
+		<http:request method="GET" doc:name="Request" doc:id="6f2d9387-1e9a-49b2-acda-1153d2e18e92" url="http://localhost:8085/api/booking/bus/schedules">
 			<http:headers ><![CDATA[#[output application/java
 ---
 {
-	"transactionid" : vars.transactionid
+	transactionId : vars.transactionId
 }]]]></http:headers>
-			<http:query-params ><![CDATA[#[output application/json
+			<http:query-params ><![CDATA[#[output application/java
 ---
 {
-	"dearturelocationcode" : attributes.queryParams.departureLocationCode,
-	"desinationlocationcode": attributes.queryParams.destinationLocationCode
+	departureLocation : vars.departureLocation,
+	destinationLocation : vars.destinationLocation
 }]]]></http:query-params>
 		</http:request>
-		<ee:transform doc:name="Transform Message" doc:id="e453c2b5-ee08-44e1-8bc7-0bc0d4726dc4" >
+		<ee:transform doc:name="Transform Message" doc:id="e553a769-2551-442c-ba3a-192290c88a39" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-payload map(value,index)->{
-	
-"departureDateTime": value.departuredateandtime,
-"fromLocation":value.fromlocation,
-"toLocation":value.tolacation,
-"availableSeats":value.availableseats
-}
+payload map(value,index)->
+{
+    "companyCode": vars.companyName,
+    "originLocation": {
+      "locationCode": vars.departureLocation,
+      "locationDesc": "beavuna singapore"
+    },
+    "destinationLocation": {
+      "locationCode": vars.destinationLocation,
+      "locationDesc": "Klang Malaysia"
+    }
+  }
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
