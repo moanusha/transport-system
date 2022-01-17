@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="schedulespapiSub_Flow" doc:id="97887cca-13a9-4d4a-b8c5-b54f8126a82f" >
+		<set-variable value='#["/api/" ++ (vars.transporttype default "Bus") ++ p("http.requesterfastgo.schedulespath")]' doc:name="Set Variable" doc:id="a0877c6b-5bb7-43b4-8b97-82c3a95b65e4" variableName="resourcepath"/>
+		<http:request method="GET" doc:name="Request" doc:id="1f1fa393-6cc8-43bd-9b64-b642bee3685d" path="#[vars.resourcepath]" config-ref="HTTP_Request_configuration"/>
+		<ee:transform doc:name="Transform Message" doc:id="3b1f94c5-53f7-4edf-9652-2130825f46e7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map(value,index)->
+ {
+  "companyName": "TravelOnTip",
+"availableSeats": 20,
+"departureDateTime": "2019-04-30T16:41:41", 
+  "travelRoute": {
+"originLocation": {
+"locationCode": "BEN-SG",
+"locationDesc":"beavuna singapore" 
+  },
+ "DestinationLocation":
+  { "locationCode": "KLG-MY",
+   "locationDesc": "Klang Malaysia"
+    }
+  }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>
